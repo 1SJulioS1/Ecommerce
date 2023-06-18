@@ -130,12 +130,55 @@ AUTH_USER_MODEL = 'app.CustomUser'
 
 
 SIMPLE_JWT = {
-    # Duración del token de acceso
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    # Duración del token de actualización
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-}
+    # access token duration
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=20),
 
+    # refresh token duration
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=5),
+
+    # Allow token rotation
+    'ROTATE_REFRESH_TOKENS': True,
+
+    # Blacklist after usage
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    # Updates last login in user table
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+
+    # Verify the content of generated tokens using secret key
+    'VERIFYING_KEY': SECRET_KEY,
+
+    # Audience field is excluded from token fiield
+    'AUDIENCE': None,
+
+    # Issuer field is excluded from token field
+    'ISSUER': None,
+    # JWK_URL field is excluded from token backend
+    'JWK_URL': None,
+
+    # Give some margen to expiration time
+    'LEEWAY': 0,
+
+    # Authorization header type
+    'AUTH_HEADER_TYPES': ('Bearer',),
+
+    # Name of header user for authentication
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    # Callable to determine if the user is permitted to authenticate
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+}
 # Configuración de las vistas de autenticación
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
