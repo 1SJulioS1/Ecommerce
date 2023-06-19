@@ -4,9 +4,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
-from app.serializers import CustomUserSerializer
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from app.serializers import CustomUserSerializer, CategorySerializer
 from app.permissions import *
-from app.models import CustomUser
+from app.models import CustomUser, Category
 
 
 class UserRegistrationView(APIView):
@@ -39,4 +41,22 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    permission_classes = [IsAdmin]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['username', 'email']
+    ordering_fields = ['usernname']
+
+
+class CategoryListView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name']
+
+
+class CategoryView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [IsAdmin]
