@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import CustomUser, Address
+from app.models import CustomUser, Address, Category
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -51,3 +51,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'

@@ -184,4 +184,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
+    'DEFAULT_CACHE_BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
 }
