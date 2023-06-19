@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-from app.serializers import CustomUserSerializer, CategorySerializer
+from app.serializers import *
 from app.permissions import *
 from app.models import CustomUser, Category
 
@@ -47,16 +47,41 @@ class UserListView(generics.ListAPIView):
     ordering_fields = ['usernname']
 
 
-class CategoryListView(generics.ListAPIView):
+class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name']
     ordering_fields = ['name']
+    lookup_field = 'slug'
 
 
 class CategoryView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdmin]
+    lookup_field = 'slug'
+
+
+class ProductDetailView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAdmin]
+    lookup_field = 'slug'
+
+
+class ProductView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAdmin]
+
+
+class ProductListView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name', 'category', 'price']
+    ordering_fields = ['name', 'category', 'price']
+    lookup_field = 'slug'

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import CustomUser, Address, Category
+from app.models import CustomUser, Address, Category, Product
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -57,3 +57,10 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['category', 'name', 'price', 'image']
+        depth = 1
