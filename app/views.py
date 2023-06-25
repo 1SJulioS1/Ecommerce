@@ -1,3 +1,6 @@
+from .models import Cart, CartItem
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -5,10 +8,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.decorators import api_view, permission_classes
+
+
+from django.shortcuts import get_object_or_404
+
 
 from app.serializers import *
 from app.permissions import *
-from app.models import CustomUser, Category
+from app.models import *
 
 
 class UserRegistrationView(APIView):
@@ -68,6 +76,7 @@ class ProductDetailView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+    ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
 
 
@@ -85,3 +94,36 @@ class ProductListView(generics.ListAPIView):
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_to_cart(request):
+    product_id = request.data.get('product_id')
+    quantity = request.data.get('quantity')
+
+    try:
+        product = Product.objects.get(pk=product_id)
+
+        # Verificar si el usuario tiene un carrito asociado
+        try:
+            cart = Cart.objects.get(user=request.user)
+        except Cart.DoesNotExist:
+            # Si el usuario no tiene un carrito, crear uno nuevo y asociarlo al usuario
+            cart = Cart.objects.create(user=request.user)
+
+        # Verificar si el producto ya existe en el carrito
+        cart_item = CartItem.objects.filter(cart=cart, product=product).first()
+
+        if cart_item:
+            # El producto ya existe en el carrito, actualizar la cantidad
+            cart_item.quantity += quantity
+            cart_item.save()
+        else:
+            # El producto no existe en el carrito, crear un nuevo elemento del carrito
+            cart_item = CartItem.objects.create(
+                cart=cart, product=product, quantity=quantity)
+
+        return Response({'message': 'Producto agregado al carrito exitosamente'})
+    except Product.DoesNotExist:
+        return Response({'message': 'El producto no existe'}, status=400)

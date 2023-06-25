@@ -3,6 +3,15 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from phonenumber_field.modelfields import PhoneNumberField
+from django.core.validators import RegexValidator
+
+
+phone_regex = r'^\+\d{1,3}-\d{1,3}-\d{1,4}-\d{1,4}$'
+phone_validator = RegexValidator(
+    regex=phone_regex,
+    message="El número de teléfono debe tener el siguiente formato: '+código de país-número de área-número de teléfono'."
+)
 
 
 class Address(models.Model):
@@ -10,9 +19,6 @@ class Address(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
-    postal_code = models.CharField(
-        max_length=20, blank=True, null=True, default=None)
     extra_info = models.TextField(
         max_length=300, blank=True, null=True, default=None)
 
@@ -31,7 +37,10 @@ class CustomUser(AbstractUser):
 
     user_type = models.CharField(
         max_length=20, choices=USER_TYPE_CHOICES, default='regular_user')
-
+    phone = models.CharField(
+        max_length=20,
+        validators=[phone_validator]
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
@@ -58,6 +67,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True, null=True,)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField()
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -72,7 +82,7 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, through='CartItem')
 
     def __str__(self):
@@ -81,18 +91,30 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
+    address = models.ForeignKey(Address, on_delete=models.PROTECT)
 
     def __str__(self):
         return f'{self.product.name} ({self.quantity})'
 
 
+class Courier(models.Model):
+    name = models.CharField(max_length=255)
+    phone = models.CharField(
+        max_length=20,
+        validators=[phone_validator]
+    )
+    availability = models.BooleanField(default=True)
+
+
 class Order(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, through='OrderItem')
+    address = models.ForeignKey(Address, models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    courier = models.ForeignKey(Courier, on_delete=models.PROTECT)
 
     def __str__(self):
         return f'Order #{self.id}'
