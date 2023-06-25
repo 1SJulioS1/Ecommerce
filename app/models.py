@@ -7,7 +7,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import RegexValidator
 
 
-phone_regex = r'^\+\d{1,3}-\d{1,3}-\d{1,4}-\d{1,4}$'
+phone_regex = r'^\+53\d{1}\d{7}$'
 phone_validator = RegexValidator(
     regex=phone_regex,
     message="El número de teléfono debe tener el siguiente formato: '+código de país-número de área-número de teléfono'."
@@ -32,9 +32,6 @@ class CustomUser(AbstractUser):
         ('regular_user', 'Usuario regular'),
     )
     email = models.EmailField(unique=True)
-    address = models.ForeignKey(
-        Address, null=True, blank=True, on_delete=models.SET_NULL)
-
     user_type = models.CharField(
         max_length=20, choices=USER_TYPE_CHOICES, default='regular_user')
     phone = models.CharField(

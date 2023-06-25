@@ -4,8 +4,10 @@ from .views import *
 
 urlpatterns = [
     # user management
+    path('users/', UserRegistrationView.as_view(), name='user_register'),
+
+
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('register/', UserRegistrationView.as_view(), name='user_register'),
     path('user/<int:pk>', UserDetailView.as_view(), name='user_register'),
     path('users/', UserListView.as_view(), name='user_register'),
 
