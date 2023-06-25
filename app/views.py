@@ -23,7 +23,31 @@ class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
+        data = request.data.copy()
+        data['user_type'] = 'regular_user'
+        serializer = CustomUserSerializer(data=data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            refresh_token = RefreshToken.for_user(user)
+            access_token = refresh_token.access_token
+
+            response_data = {
+                'refresh_token': str(refresh_token),
+                'access_token': str(access_token),
+            }
+
+            return Response(response_data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class AdminRegistrationView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        data = request.data.copy()
+        data['user_type'] = 'admin'
+        serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
 

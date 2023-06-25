@@ -33,7 +33,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        address_data = validated_data.pop('address')
         password = validated_data.pop('password', None)
 
         for key, value in validated_data.items():
@@ -41,13 +40,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         if password is not None:
             instance.set_password(password)
-
-        address_serializer = AddressSerializer(
-            instance.address, data=address_data)
-        address_serializer.is_valid(raise_exception=True)
-        address = address_serializer.save()
-
-        instance.address = address
         instance.save()
 
         return instance
