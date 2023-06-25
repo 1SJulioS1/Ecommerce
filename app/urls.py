@@ -4,15 +4,13 @@ from .views import *
 
 urlpatterns = [
     # user management
-    path("token/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path("login/", TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/', UserRegistrationView.as_view(), name='user_register'),
     path('users/admin/', AdminRegistrationView.as_view(), name='admin_register'),
-
-
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('user/<int:pk>', UserDetailView.as_view(), name='user_register'),
-    path('users/', UserListView.as_view(), name='user_register'),
+    path("users/me/", UserDetailView.as_view(), name="user-list-edit"),
+    path("logout/", UserLogoutView.as_view(), name=""),
+    # path('users/', UserListView.as_view(), name='user_register'),
 
     # category management
     path("category/", CategoryListView.as_view(), name="category_list_create"),

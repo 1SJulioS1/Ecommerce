@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'app',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+
 
 
 ]
@@ -140,9 +142,6 @@ SIMPLE_JWT = {
     # Allow token rotation
     'ROTATE_REFRESH_TOKENS': True,
 
-    # Blacklist after usage
-    'BLACKLIST_AFTER_ROTATION': True,
-
     # Updates last login in user table
     'UPDATE_LAST_LOGIN': False,
 
@@ -168,8 +167,6 @@ SIMPLE_JWT = {
     # Name of header user for authentication
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
 
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
     # Callable to determine if the user is permitted to authenticate
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
 
