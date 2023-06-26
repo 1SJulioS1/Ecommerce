@@ -4,23 +4,28 @@ db.sqlite3
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-FRONTEND/node_modules
-FRONTEND/.pnp
-FRONTEND/.pnp.js
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
 
 # testing
 FRONTEND//coverage
 
 # production
-FRONTEND/build
+frontend/build
 
 # misc
-FRONTEND/.DS_Store
-FRONTEND/.env.local
-FRONTEND/.env.development.local
-FRONTEND/.env.test.local
-FRONTEND/.env.production.local
+frontend/.DS_Store
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-FRONTEND/npm-debug.log*
-FRONTEND/yarn-debug.log*
-FRONTEND/yarn-error.log*
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+Pipfile
+Pipfile.lock
+.venv
+db.sqlite3
