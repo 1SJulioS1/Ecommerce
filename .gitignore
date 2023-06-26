@@ -1,3 +1,26 @@
 /venv
-/FRONTEND/node_modules
 db.sqlite3
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+FRONTEND/node_modules
+FRONTEND/.pnp
+FRONTEND/.pnp.js
+
+# testing
+FRONTEND//coverage
+
+# production
+FRONTEND/build
+
+# misc
+FRONTEND/.DS_Store
+FRONTEND/.env.local
+FRONTEND/.env.development.local
+FRONTEND/.env.test.local
+FRONTEND/.env.production.local
+
+FRONTEND/npm-debug.log*
+FRONTEND/yarn-debug.log*
+FRONTEND/yarn-error.log*
