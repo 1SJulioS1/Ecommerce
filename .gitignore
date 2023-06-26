@@ -29,3 +29,15 @@ Pipfile
 Pipfile.lock
 .venv
 db.sqlite3
+
+
+*.pyc
+app/__pycache__/
+backend/__pycache__/
+__pycache__/
+*.sqlite3
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
