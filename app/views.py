@@ -8,6 +8,8 @@ from rest_framework import generics, status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.decorators import api_view, permission_classes
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 from django.shortcuts import get_object_or_404
 
@@ -18,8 +20,27 @@ from app.models import *
 
 
 class UserRegistrationView(APIView):
+    """
+    Allows buyers to register in the system
+    """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'email', 'phone', 'password'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
+                'phone': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Phone number field',
+                    pattern=r'^\+?[1-9]\d{1,14}$'
+                )
+            },
+        ),
+        responses={200: 'Success', 400: 'Error'})
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'regular_user'
