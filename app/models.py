@@ -45,7 +45,7 @@ class CustomUser(AbstractUser):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True,  blank=True)
 
     def save(self, *args, **kwargs):
