@@ -10,12 +10,14 @@ urlpatterns = [
     path('users/admin/', AdminRegistrationView.as_view(), name='admin_register'),
     path("users/me/", UserDetailView.as_view(), name="user-list-edit"),
     path("logout/", UserLogoutView.as_view(), name=""),
-    # path('users/', UserListView.as_view(), name='user_register'),
+    path('users/list', UserListView.as_view(), name='user_register'),
+
 
     # category management
     path("category/", CategoryListView.as_view(), name="category_list_create"),
+    path("category/create/", CategoryCreateView.as_view(), name="category_create"),
     path("category/<slug:slug>",
-         CategoryView.as_view(), name="category_detail"),
+         CategoryDetailUpdateDeleteView.as_view(), name="category_detail_update_remove"),
 
     # product management
     path("product/", ProductDetailView.as_view(), name="product_list_create"),
