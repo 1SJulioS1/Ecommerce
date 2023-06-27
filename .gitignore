@@ -41,3 +41,5 @@ __pycache__/
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+app/migrations/__pycache__/
