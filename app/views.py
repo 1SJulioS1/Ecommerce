@@ -61,14 +61,28 @@ class AdminRegistrationView(APIView):
         return Response(serializer.errors, status=400)
 
 
-class UserDetailView(generics.RetrieveUpdateAPIView):
+class UserDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
 
-    def get_object(self):
-        return self.request.user
+    def get(self, request):
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        user = CustomUser.objects.get(username=request.user.username)
+        allowed_fields = ['email', 'phone', 'username', 'password']
+        data = {field: request.data.get(
+            field) for field in allowed_fields if field in request.data}
+        serializer = CustomUserSerializer(
+            user, data=request.data, partial=True)
+        if serializer.is_valid():
+            if 'password' in data:
+                user.set_password(data['password'])
+            serializer.save()
+            return Response({'message': 'Succeed!'}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=400)
 
 
 class UserLogoutView(APIView):
@@ -93,17 +107,22 @@ class UserListView(generics.ListAPIView):
     ordering_fields = ['usernname']
 
 
-class CategoryListView(generics.ListCreateAPIView):
+class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name']
     ordering_fields = ['name']
-    lookup_field = 'slug'
 
 
-class CategoryView(generics.RetrieveUpdateDestroyAPIView):
+class CategoryCreateView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdmin]
+
+
+class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdmin]
