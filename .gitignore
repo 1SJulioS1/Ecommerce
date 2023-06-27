@@ -34,6 +34,7 @@ db.sqlite3
 *.pyc
 app/__pycache__/
 backend/__pycache__/
+app/migrations/__pycache__/
 __pycache__/
 *.sqlite3
 
