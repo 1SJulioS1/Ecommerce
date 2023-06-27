@@ -10,6 +10,7 @@ section {
   border-radius: 25px;
   margin: auto;
   margin-top: 5vh;
+  border: 1px solid black;
 }
 
 form {

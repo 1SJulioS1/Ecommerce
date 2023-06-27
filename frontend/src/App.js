@@ -12,6 +12,7 @@ import Register from './components/Register';
 import DashboardSharedLayout from './components/DashboardSharedLayout';
 import Dashboard from './components/Dashboard';
 import DashboardClients from './components/DashboardClients'
+import Login from './components/Login';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path='cart' element={<Cart/>}></Route>
           <Route path='*' element={<ErrorPage/>}></Route>
           <Route path='register' element={<Register/>}></Route>
+          <Route path='login' element={<Login/>}></Route>
           
         </Route>
         <Route path='/admin' element={<DashboardSharedLayout/>}>

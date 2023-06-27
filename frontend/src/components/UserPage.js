@@ -7,6 +7,8 @@ const UserPage = () => {
     <div className='user-page'>
       <h1>This is the user Page</h1>
       <Link to='/register'>Register</Link>
+      Already have an account? <br/>
+      <Link to='/login'>Login</Link>
     </div>
   )
 }
