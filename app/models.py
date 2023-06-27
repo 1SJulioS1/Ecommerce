@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.core.validators import RegexValidator
 
 
-phone_regex = r'^\+53\d{1}\d{7}$'
+phone_regex = r'[+535]\d{10}$'
 phone_validator = RegexValidator(
     regex=phone_regex,
     message="El número de teléfono debe tener el siguiente formato: '+código de país-número de área-número de teléfono'."

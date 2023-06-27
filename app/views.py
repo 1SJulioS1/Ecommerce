@@ -36,7 +36,7 @@ class UserRegistrationView(APIView):
                 'phone': openapi.Schema(
                     type=openapi.TYPE_STRING,
                     description='Phone number field',
-                    pattern=r'^\+?[1-9]\d{1,14}$'
+                    pattern=r'^[+535]\d{10}$'
                 )
             },
         ),
