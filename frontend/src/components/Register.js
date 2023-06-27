@@ -1,14 +1,11 @@
 import { useRef, useState, useEffect } from "react";
-import './RegisterFormStyles.css'
+import './RegisterStyles.css'
 // import axios from '../api/axios';
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*/+-.,]).{8,24}$/;
-const REGISTER_URL = '/register';
-const email = '123@123.com';
-const phone = +5355742168;
-
-
+const EMAIL_REGEX = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
+const PHONE_REGEX = /^5\d{7}$/
 
 const Register = () => {
     const userRef = useRef();
@@ -18,6 +15,14 @@ const Register = () => {
     const [validName, setValidName] = useState(false);
     const [userFocus, setUserFocus] = useState(false);
 
+    const [email,setEmail] = useState('');
+    const [validEmail,setValidEmail] = useState(false);
+    const [emailFocus,setEmailFocus] = useState(false)
+    
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [validPhoneNumber,setValidPhoneNumber]= useState(false);
+    const [phoneNumberFocus, setPhoneNumberFocus] = useState(false);
+    
     const [pwd, setPwd] = useState('');
     const [validPwd, setValidPwd] = useState(false);
     const [pwdFocus, setPwdFocus] = useState(false);
@@ -25,6 +30,8 @@ const Register = () => {
     const [matchPwd, setMatchPwd] = useState('');
     const [validMatch, setValidMatch] = useState(false);
     const [matchFocus, setMatchFocus] = useState(false);
+
+
 
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
@@ -36,6 +43,14 @@ const Register = () => {
     useEffect(() => {
         setValidName(USER_REGEX.test(user));
     }, [user])
+    
+    useEffect(() => {
+        setValidEmail(EMAIL_REGEX.test(email));
+    }, [email])
+
+    useEffect(() => {
+        setValidPhoneNumber(PHONE_REGEX.test(phoneNumber));
+    }, [phoneNumber])
 
     useEffect(() => {
         setValidPwd(PWD_REGEX.test(pwd));
@@ -48,20 +63,34 @@ const Register = () => {
         
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const userData = {
+            email:email,
+            phone:`+53${phoneNumber}`,
+            password:pwd,
+            username:user,
+            
+        }
+        console.log(email, phoneNumber, pwd, user)
+            
+     
         // if button enabled with JS hack
         const v1 = USER_REGEX.test(user);
         const v2 = PWD_REGEX.test(pwd);
-        if (!v1 || !v2) {
+        const v3 = EMAIL_REGEX.test(email);
+        const v4 = PHONE_REGEX.test(phoneNumber);
+        console.log(userData)
+        if (!v1 || !v2 || !v3 || !v4) {
             setErrMsg("Invalid Entry");
             return;
         }
+        
         try {
             fetch('http://127.0.0.1:8000/api/users/', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username:'3duser', password:'1359879', email:'3rd@email.com', phone:'+5355664488'} ), // Replace with your data object
+            body: JSON.stringify(userData), // Replace with your data object
             })
             .then(response => {
                 console.log(response)
@@ -82,7 +111,7 @@ const Register = () => {
         } catch (error) {
             console.log(error)
         }
-        setSuccess(true);
+        setSuccess(true)
         
 
         
@@ -155,6 +184,46 @@ const Register = () => {
                             Must begin with a letter.<br />
                             Letters, numbers, underscores, hyphens allowed.
                         </p>
+                        
+                        <label htmlFor="email">
+                            Email:
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            ref={userRef}
+                            autoComplete="off"
+                            onChange={(e) => {setEmail(e.target.value); console.log({validEmail})}}
+                            value={email}
+                            required
+                            aria-invalid={validEmail ? "false" : "true"}
+                            aria-describedby="uidnote"
+                            onFocus={() => setEmailFocus(true)}
+                            onBlur={() => setEmailFocus(false)}
+                        />
+                        <p id="uidnote" className={emailFocus && email && !validEmail ? "instructions" : "offscreen"}>
+                            Must be a correct email address<br />                            
+                        </p>
+
+                        <label htmlFor="phone">
+                            Phone Number +53:
+                        </label>
+                        <input
+                            type="text"
+                            id="phone"
+                            ref={userRef}
+                            autoComplete="off"
+                            onChange={(e) => {setPhoneNumber(e.target.value); console.log({validPhoneNumber})}}
+                            value={phoneNumber}
+                            required
+                            aria-invalid={validPhoneNumber ? "false" : "true"}
+                            aria-describedby="uidnote"
+                            onFocus={() => setPhoneNumberFocus(true)}
+                            onBlur={() => setPhoneNumberFocus(false)}
+                        />
+                        <p id="uidnote" className={phoneNumberFocus && phoneNumber && !validPhoneNumber ? "instructions" : "offscreen"}>
+                            Must be in the format +53********<br />                            
+                        </p>
 
 
                         <label htmlFor="password">
@@ -200,7 +269,7 @@ const Register = () => {
                             Must match the first password input field.
                         </p>
 
-                        <button disabled={!validName || !validPwd || !validMatch ? true : false}>Sign Up</button>
+                        <button disabled={!validName || !validPwd || !validMatch || !validEmail || !validPhoneNumber ? true : false}>Sign Up</button>
                     </form>
                     <p>
                         Already registered?<br />

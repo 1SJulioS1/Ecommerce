@@ -44,8 +44,8 @@ const Home = () => {
       <h1>This is the home page</h1>
       <h2>List of products</h2>
       {products.map((each)=>
-      <Link to={`/products/:${each.id}`}>
-        <ProductCard name={each.name} description={each.description} image={each.image}></ProductCard>
+      <Link key={each.id} to={`/products/:${each.id}`}>
+        <ProductCard key={each.id} name={each.name} description={each.description} image={each.image}></ProductCard>
       </Link>)
       } 
       
