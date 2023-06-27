@@ -1,7 +1,7 @@
 .bottom-nav-bar ul {
   display: flex;
   justify-content: space-evenly;
-  background-color: crimson;
+  background-color: blue;
   position: fixed;
   bottom: 0;
   margin: auto;
