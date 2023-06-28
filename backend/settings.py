@@ -193,6 +193,10 @@ REST_FRAMEWORK = {
     'DEFAULT_CACHE_BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
 }
 
+SWAGGER_SETTINGS = {
+    # Ruta de importación a tu objeto openapi.Info
+    'DEFAULT_INFO': 'app.swagger.api_info',
+}
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True

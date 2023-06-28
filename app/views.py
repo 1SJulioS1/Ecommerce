@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from app.serializers import *
 from app.permissions import *
 from app.models import *
+from .custom_responses import *
 
 
 class UserRegistrationView(APIView):
@@ -40,7 +41,8 @@ class UserRegistrationView(APIView):
                 )
             },
         ),
-        responses={200: 'Success', 400: 'Error'})
+        responses=access_token_
+    )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'regular_user'
@@ -61,8 +63,36 @@ class UserRegistrationView(APIView):
 
 
 class AdminRegistrationView(APIView):
+    """
+    Allows Admin to register in the system
+    """
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'email', 'phone', 'password'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
+                'phone': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Phone number field',
+                    pattern=r'^[+535]\d{10}$'
+                )
+            },
+        ),
+        responses=access_token_,
+        manual_parameters=[
+            openapi.Parameter(
+                name='Authorization',
+                in_=openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                description='Bearer Token',
+            )
+        ]
+    )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'admin'
