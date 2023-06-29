@@ -17,3 +17,12 @@ access_token_ = {200: openapi.Response(
     )
 ),
 }
+
+token_as_parameters = [
+    openapi.Parameter(
+        name='Authorization',
+        in_=openapi.IN_HEADER,
+        type=openapi.TYPE_STRING,
+        description='Bearer Token',
+    )
+]

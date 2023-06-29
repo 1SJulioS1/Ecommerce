@@ -41,7 +41,15 @@ class UserRegistrationView(APIView):
                 )
             },
         ),
-        responses=access_token_
+        responses={
+            200: openapi.Response(
+                description='Succeed',
+            ),
+            400: openapi.Response(
+                description='Error',
+            ),
+
+        }
     )
     def post(self, request):
         data = request.data.copy()
@@ -50,15 +58,7 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            refresh_token = RefreshToken.for_user(user)
-            access_token = refresh_token.access_token
-
-            response_data = {
-                'refresh_token': str(refresh_token),
-                'access_token': str(access_token),
-            }
-
-            return Response(response_data, status=201)
+            return Response({'Message': 'Succeed'}, status=201)
         return Response(serializer.errors, status=400)
 
 
@@ -113,9 +113,38 @@ class AdminRegistrationView(APIView):
 
 
 class UserDetailView(APIView):
+    """
+    Allows users to see and edit its profile info
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description='Success',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'username': openapi.Schema(type=openapi.TYPE_STRING),
+                        'email': openapi.Schema(type=openapi.TYPE_STRING),
+                        'user_type': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            enum=['regular_user', 'admin']
+
+                        ),
+                        'phone': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Phone number field',
+                            pattern=r'^[+535]\d{10}$'
+                        )
+                    },
+                ),
+            ),
+            # Otros códigos de respuesta aquí...
+        },
+        manual_parameters=token_as_parameters
+    )
     def get(self, request):
         serializer = CustomUserSerializer(request.user)
         return Response(serializer.data)
