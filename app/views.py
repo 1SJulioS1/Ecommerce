@@ -295,7 +295,9 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             200: CategorySerializer(),
             401: "Unauthorized",
             404: "Not found"
-        }
+        },
+        manual_parameters=token_as_parameters
+
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -307,7 +309,9 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             400: "Bad request",
             401: "Unauthorized",
             404: "Not found"
-        }
+        },
+        manual_parameters=token_as_parameters
+
     )
     def put(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
@@ -319,7 +323,9 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             400: "Bad request",
             401: "Unauthorized",
             404: "Not found"
-        }
+        },
+        manual_parameters=token_as_parameters
+
     )
     def patch(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
@@ -330,7 +336,9 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             204: "No content",
             401: "Unauthorized",
             404: "Not found"
-        }
+        },
+        manual_parameters=token_as_parameters
+
     )
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
