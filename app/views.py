@@ -280,7 +280,7 @@ class CategoryCreateView(generics.CreateAPIView):
         manual_parameters=token_as_parameters
     )
     def post(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -333,7 +333,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(
         operation_description="Delete a single instance of MyModel",
         responses={
-            204: "No content",
+            204: "Remove success",
             401: "Unauthorized",
             404: "Not found"
         },
@@ -344,18 +344,111 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-class ProductDetailView(generics.ListCreateAPIView):
+class ProductCreateView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+            400: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                ),
+                operation_description='Not allowed to enter this view'
+
+            ),
+        },
+        manual_parameters=token_as_parameters
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class ProductDetailView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+        },
+        operation_description="Retrieve a single instance of Product",
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class ProductView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        operation_description="Retrieve a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Delete a single instance of Product",
+        responses={
+            204: "Remove success",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
 
 class ProductListView(generics.ListAPIView):
@@ -366,6 +459,14 @@ class ProductListView(generics.ListAPIView):
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 @api_view(['POST'])

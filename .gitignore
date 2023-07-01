@@ -45,3 +45,5 @@ __pycache__/
 
 app/migrations/__pycache__/
 swagger.json
+
+media/*

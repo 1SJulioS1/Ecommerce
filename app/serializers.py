@@ -40,29 +40,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all())
+    image = serializers.ImageField(write_only=True, required=False)
+    image_display = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
-        fields = ['category', 'name', 'price', 'image']
+        fields = ['category', 'name', 'price',
+                  'image', 'image_display', 'quantity']
         depth = 1
 
-    def get_image(self, obj):
-        if obj.image.url.startswith('http'):  # Verifica si es una URL
-            return obj.image.url
-        else:
-            return obj.image.name
-
-    def validate_image(self, value):
-        if value.startswith('http'):  # Verifica si es una URL
-            try:
-                response = requests.get(value, timeout=10)
-                img_temp = NamedTemporaryFile(delete=True)
-                img_temp.write(response.content)
-                img_temp.flush()
-                return img_temp
-            except requests.exceptions.RequestException:
-                raise serializers.ValidationError(
-                    'Error al descargar la imagen desde la URL.')
-        else:
-            return value
+    def get_image_display(self, obj):
+        return obj.image.url if obj.image else None
