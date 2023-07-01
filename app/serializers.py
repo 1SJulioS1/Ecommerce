@@ -41,7 +41,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all())
+        queryset=Category.objects.all(),
+        required=False
+    )
+    price = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        required=False
+    )
+    quantity = serializers.IntegerField(
+        required=False
+    )
     image = serializers.ImageField(write_only=True, required=False)
     image_display = serializers.SerializerMethodField(read_only=True)
 

@@ -396,6 +396,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+    lookup_field = 'slug'
 
     @swagger_auto_schema(
         operation_description="Retrieve a single instance of Product",
