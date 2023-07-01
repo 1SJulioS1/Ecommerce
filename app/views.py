@@ -352,7 +352,7 @@ class ProductCreateView(generics.CreateAPIView):
     @swagger_auto_schema(
         responses={
             200: ProductSerializer(many=True),
-            400: openapi.Response(
+            401: openapi.Response(
                 description="Unauthorized",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
@@ -367,6 +367,7 @@ class ProductCreateView(generics.CreateAPIView):
                 operation_description='Not allowed to enter this view'
 
             ),
+            400: "Bad request",
         },
         manual_parameters=token_as_parameters
     )
