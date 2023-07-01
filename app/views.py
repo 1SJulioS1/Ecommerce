@@ -455,7 +455,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
