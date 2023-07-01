@@ -40,25 +40,15 @@ class UserRegistrationView(APIView):
                     pattern=r'^[+535]\d{10}$'
                 )
             },
-        ),
-        responses={
-            200: openapi.Response(
-                description='Succeed',
-            ),
-            400: openapi.Response(
-                description='Error',
-            ),
-
-        }
+        )
     )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'regular_user'
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
-            user = serializer.save()
-
-            return Response({'Message': 'Succeed'}, status=201)
+            serializer.save()
+            return Response({'messsage': 'Completed'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=400)
 
 
