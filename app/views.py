@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 from app.serializers import *
 from app.permissions import *
 from app.models import *
-from .custom_responses import *
+from .custom_strings import *
 
 
 class UserRegistrationView(APIView):
@@ -73,32 +73,15 @@ class AdminRegistrationView(APIView):
                 )
             },
         ),
-        responses=access_token_,
-        manual_parameters=[
-            openapi.Parameter(
-                name='Authorization',
-                in_=openapi.IN_HEADER,
-                type=openapi.TYPE_STRING,
-                description='Bearer Token',
-            )
-        ]
+        manual_parameters=token_as_parameters
     )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'admin'
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
-            user = serializer.save()
-
-            refresh_token = RefreshToken.for_user(user)
-            access_token = refresh_token.access_token
-
-            response_data = {
-                'refresh_token': str(refresh_token),
-                'access_token': str(access_token),
-            }
-
-            return Response(response_data, status=201)
+            serializer.save()
+            return Response({'messsage': 'Completed'}, status=201)
         return Response(serializer.errors, status=400)
 
 

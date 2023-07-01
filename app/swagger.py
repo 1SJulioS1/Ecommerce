@@ -4,7 +4,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 api_info = openapi.Info(
-    title='Mi API',
+    title='My API',
     default_version='v1',
     description='Descripción de mi API',
     contact=openapi.Contact(email='contact@example.com'),
