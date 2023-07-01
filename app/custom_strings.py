@@ -26,3 +26,18 @@ token_as_parameters = [
         description='Bearer Token',
     )
 ]
+
+
+unauthorized = openapi.Response(
+    description="Unauthorized",
+    schema=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'error': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Error message"
+            )
+        },
+        required=['error']
+    )
+),

@@ -1,8 +1,18 @@
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path
 from .views import *
-from .swagger import schema_view
-
+from .swagger import get_schema_view
+from rest_framework import permissions
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Torresuelto webpage API",
+        default_version='v1',
+        description="Test API",
+        contact=openapi.Contact(email="sjsiless@gmail.com"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 urlpatterns = [
 
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0),
