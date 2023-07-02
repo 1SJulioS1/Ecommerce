@@ -47,6 +47,8 @@ class CustomUser(AbstractUser):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True,  blank=True)
+    parent_category = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
 
     def save(self, *args, **kwargs):
         if not self.slug or self.name:
