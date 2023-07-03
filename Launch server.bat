@@ -1,5 +1,6 @@
-cd venv
-cd Scripts
-activate
-cd ../..
+@echo off
+cd venv\Scripts
+call activate
+cd ..
+cd ..
 python manage.py runserver
