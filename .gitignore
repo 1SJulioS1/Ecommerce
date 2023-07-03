@@ -47,3 +47,4 @@ app/migrations/__pycache__/
 swagger.json
 
 media/*
+Launch server.bat
