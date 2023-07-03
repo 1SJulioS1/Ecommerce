@@ -1,14 +1,22 @@
 import { Outlet } from "react-router-dom";
 import BottomNavBar from "./BottomNavBar";
-import React from 'react'
+import React from "react";
+import CategoriesNavBar from "./CategoriesNavBar";
+import { useState } from "react";
 
 const SharedLayout = () => {
+  const [activeSideNav, setActiveSideNav] = useState(false);
+  const toggleSideNav = () => {
+    setActiveSideNav(!activeSideNav);
+  };
   return (
-    <div>
-      <BottomNavBar></BottomNavBar>
-      <Outlet></Outlet>
-    </div>
-  )
-}
+    <>
+      <BottomNavBar switchSideNav={toggleSideNav}></BottomNavBar>
 
-export default SharedLayout
+      {activeSideNav ? <CategoriesNavBar switchSideNav={toggleSideNav} /> : ""}
+      <Outlet></Outlet>
+    </>
+  );
+};
+
+export default SharedLayout;
