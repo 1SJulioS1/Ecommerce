@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from app.serializers import *
 from app.permissions import *
 from app.models import *
+from .custom_strings import *
 
 
 class UserRegistrationView(APIView):
@@ -36,60 +37,121 @@ class UserRegistrationView(APIView):
                 'phone': openapi.Schema(
                     type=openapi.TYPE_STRING,
                     description='Phone number field',
-                    pattern=r'^\+?[1-9]\d{1,14}$'
+                    pattern=r'^[+535]\d{10}$'
                 )
             },
-        ),
-        responses={200: 'Success', 400: 'Error'})
+        )
+    )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'regular_user'
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
-            user = serializer.save()
-
-            refresh_token = RefreshToken.for_user(user)
-            access_token = refresh_token.access_token
-
-            response_data = {
-                'refresh_token': str(refresh_token),
-                'access_token': str(access_token),
-            }
-
-            return Response(response_data, status=201)
+            serializer.save()
+            return Response({'messsage': 'Completed'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=400)
 
 
 class AdminRegistrationView(APIView):
+    """
+    Allows Admin to register in the system
+    """
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'email', 'phone', 'password'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
+                'phone': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Phone number field',
+                    pattern=r'^[+535]\d{10}$'
+                )
+            },
+        ),
+        manual_parameters=token_as_parameters
+    )
     def post(self, request):
         data = request.data.copy()
         data['user_type'] = 'admin'
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
-            user = serializer.save()
-
-            refresh_token = RefreshToken.for_user(user)
-            access_token = refresh_token.access_token
-
-            response_data = {
-                'refresh_token': str(refresh_token),
-                'access_token': str(access_token),
-            }
-
-            return Response(response_data, status=201)
+            serializer.save()
+            return Response({'messsage': 'Completed'}, status=201)
         return Response(serializer.errors, status=400)
 
 
 class UserDetailView(APIView):
+    """
+    Allows users to see and edit its profile info
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description='Success',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'username': openapi.Schema(type=openapi.TYPE_STRING),
+                        'email': openapi.Schema(type=openapi.TYPE_STRING),
+                        'user_type': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            enum=['regular_user', 'admin']
+                        ),
+                        'phone': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Phone number field',
+                            pattern=r'^[+535]\d{10}$'
+                        )
+                    },
+                ),
+                operation_description='Retrieve user profile data'
+            ),
+        },
+        manual_parameters=token_as_parameters
+    )
     def get(self, request):
         serializer = CustomUserSerializer(request.user)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description="Success",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'data': openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            description="Response data"
+                        )
+                    },
+                    required=['data']
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                )
+            ),
+        },
+        manual_parameters=token_as_parameters
+    )
     def patch(self, request):
         user = CustomUser.objects.get(username=request.user.username)
         allowed_fields = ['email', 'phone', 'username', 'password']
@@ -103,12 +165,30 @@ class UserDetailView(APIView):
             serializer.save()
             return Response({'message': 'Succeed!'}, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogoutView(APIView):
+    """
+    Logout from the system
+    """
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description='Success',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'refresh_token': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                ),
+                operation_description='Retrieve user profile data'
+            ),
+        },
+        manual_parameters=token_as_parameters
+    )
     def post(self, request):
         try:
             refresh_token = request.data["refresh_token"]
@@ -120,12 +200,40 @@ class UserLogoutView(APIView):
 
 
 class UserListView(generics.ListAPIView):
+    """
+    View all user data
+    """
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdmin]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['username', 'email']
     ordering_fields = ['usernname']
+
+    @swagger_auto_schema(
+        responses={
+            200: CustomUserSerializer(many=True),
+            400: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                ),
+                operation_description='Not allowed to enter this view'
+
+            ),
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class CategoryListView(generics.ListAPIView):
@@ -136,11 +244,43 @@ class CategoryListView(generics.ListAPIView):
     search_fields = ['name']
     ordering_fields = ['name']
 
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(many=True),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class CategoryCreateView(generics.CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        responses={
+            200: CategorySerializer(many=True),
+            400: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                ),
+                operation_description='Not allowed to enter this view'
+
+            ),
+        },
+        manual_parameters=token_as_parameters
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -149,29 +289,186 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdmin]
     lookup_field = 'slug'
 
+    @swagger_auto_schema(
+        operation_description="Retrieve, update, or delete a single instance of Category",
+        responses={
+            200: CategorySerializer(),
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
 
-class ProductDetailView(generics.ListCreateAPIView):
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Category",
+        responses={
+            200: CategorySerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Category",
+        responses={
+            200: CategorySerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Delete a single instance of MyModel",
+        responses={
+            204: "Remove success",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
+
+
+class ProductCreateView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+            401: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                ),
+                operation_description='Not allowed to enter this view'
+
+            ),
+            400: "Bad request",
+        },
+        manual_parameters=token_as_parameters
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class ProductDetailView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+        },
+        operation_description="Retrieve a single instance of Product",
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class ProductView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdmin]
+    lookup_field = 'slug'
+
+    @swagger_auto_schema(
+        operation_description="Retrieve a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Product",
+        responses={
+            200: ProductSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Delete a single instance of Product",
+        responses={
+            204: "Remove success",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
 
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+    @swagger_auto_schema(
+        responses={
+            200: ProductSerializer(many=True),
+        },
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 @api_view(['POST'])

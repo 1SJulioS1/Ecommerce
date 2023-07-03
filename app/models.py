@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.core.validators import RegexValidator
 
 
-phone_regex = r'^\+53\d{1}\d{7}$'
+phone_regex = r'[+535]\d{10}$'
 phone_validator = RegexValidator(
     regex=phone_regex,
     message="El número de teléfono debe tener el siguiente formato: '+código de país-número de área-número de teléfono'."
@@ -47,6 +47,8 @@ class CustomUser(AbstractUser):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True,  blank=True)
+    parent_category = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
 
     def save(self, *args, **kwargs):
         if not self.slug or self.name:
