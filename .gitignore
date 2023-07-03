@@ -44,3 +44,6 @@ __pycache__/
 *.sublime-workspace
 
 app/migrations/__pycache__/
+swagger.json
+
+media/*
