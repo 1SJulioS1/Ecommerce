@@ -91,7 +91,6 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=1)
-    address = models.ForeignKey(Address, on_delete=models.PROTECT)
 
     def __str__(self):
         return f'{self.product.name} ({self.quantity})'
