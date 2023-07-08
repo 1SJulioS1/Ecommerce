@@ -109,7 +109,7 @@ class Courier(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, through='OrderItem')
-    address = models.ForeignKey(Address, models.PROTECT)
+    address = models.ForeignKey(Address, models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     courier = models.ForeignKey(Courier, on_delete=models.PROTECT)
