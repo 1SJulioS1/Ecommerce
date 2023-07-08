@@ -108,11 +108,20 @@ class Courier(models.Model):
 
 
 class Order(models.Model):
+    CHOICES = (
+        ('processing', 'Procesando'),
+        ('sending', 'En envío'),
+        ('received', 'Recibida'),
+        ('paid', 'Pagada'),
+    )
+
     user = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
     address = models.ForeignKey(Address, models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     courier = models.ForeignKey(Courier, on_delete=models.PROTECT)
+    status = models.CharField(
+        max_length=30, choices=CHOICES, default='processing')
 
     def __str__(self):
         return f'Order #{self.id}'
