@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import axios from "../api/axios";
@@ -22,7 +22,7 @@ const Login = () => {
     try {
       const response = await axios.post(
         "api/login/",
-        JSON.stringify({ email, password }),
+        JSON.stringify({ email: email, password: password }),
         {
           headers: { "Content-Type": "application/json" },
           // withCredentials: true,
@@ -57,7 +57,7 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-black">
+    <div className="  magicpattern h-screen">
       {/* {success ? (
         <div>
           <h1>You are logged in</h1>
@@ -67,7 +67,7 @@ const Login = () => {
           </p>
         </div>
       ) : ( */}
-      <div className="flex min-h-full py-10 flex-1 flex-col justify-center px-6 lg:px-8 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="flex pt-20 h-full w-full flex-col lg:px-0 sm:mx-auto sm:w-full sm:max-w-sm">
         <p
           ref={errRef}
           className={errMsg ? "errmsg" : "offscreen"}
@@ -76,69 +76,81 @@ const Login = () => {
           {errMsg}
         </p>
 
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900 mb-3">
-          Sign in to your account
-        </h2>
-
         <form
           onSubmit={handleSubmit}
-          className=" space-y-3 p-6 glass rounded-lg"
+          className=" space-y-7 py-10 mt-10 px-8 glass rounded-lg "
         >
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-900 text-left"
+          <h2
+            className=" 
+        text-black scale-125 text-center text-2xl font-bold tracking-tight  mb-3"
           >
-            Email:
-          </label>
+            Sign in to your account
+          </h2>
+          <div className="group">
+            <label
+              htmlFor="email"
+              className="block text-sm group-hover:ml-[10%] group-hover:scale-125 transition-all font-medium text-gray-900 text-left"
+            >
+              Email:
+            </label>
 
-          <input
-            className="p-1 rounded-lg focus-visible:border-cyan-600  w-full transition-all"
-            type="email"
-            id="email"
-            ref={userRef}
-            autoComplete="off"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            placeholder="Ex: example@gmail.com "
-            required
-          />
+            <input
+              className="p-1 
+               border  border-black rounded-lg w-full transition-all"
+              type="email"
+              id="email"
+              ref={userRef}
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              placeholder="Ex: example@gmail.com "
+              required
+            />
+          </div>
+          <div className="group">
+            <label
+              htmlFor="password"
+              className="group-hover:ml-[10%] transition-all group-hover:scale-125 block text-sm font-medium text-gray-900 text-left"
+            >
+              Password:
+            </label>
 
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-900 text-left"
-          >
-            Password:
-          </label>
-
-          <input
-            className="p-1 rounded-lg focus-visible:border-cyan-600 w-full transition-all"
-            type="password"
-            id="password"
-            onChange={(e) => setPwd(e.target.value)}
-            value={password}
-            placeholder="Type your password here"
-            required
-          />
+            <input
+              className="p-1 
+              border border-black
+              rounded-lg focus-visible:border-cyan-600 w-full transition-all"
+              type="password"
+              id="password"
+              onChange={(e) => setPwd(e.target.value)}
+              value={password}
+              placeholder="Type your password here"
+              required
+            />
+          </div>
           {/*
              {Link to forgot Password page} 
             */}
           <a
             href="/"
-            className="text-right font-semibold text-indigo-600 hover:text-indigo-500 block"
+            className="text-right font-semibold text-indigo-600 hover:text-indigo-500 block underline"
           >
             Forgot password?
           </a>
 
           <button
             type="submit"
-            className="flex w-full  justify-center rounded-md bg-indigo-600 p-3 text-sm font-semibold  text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="flex w-full  justify-center rounded-md bg-black p-3 text-sm font-semibold  text-white shadow-sm uppercase hover:bg-indigo-800 transition-all border border-[indigo] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Sign in
           </button>
 
           <h2>You do not have an account?</h2>
           <Link
-            className=" underline text-cyan-700 active:text-black"
+            className=" underline
+            w-full  
+            font-semibold
+            float-left
+            active:text-black
+            text-indigo-600 hover:text-indigo-500"
             to="/register"
           >
             Register here

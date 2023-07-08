@@ -2,15 +2,22 @@ import { useEffect, useState } from "react";
 
 const CategoriesNavBar = ({ switchSideNav }) => {
   const [categories, setCategories] = useState({});
-  useEffect(() => {
-    try {
-      fetch("http://127.0.0.1:8000/api/category/")
-        .then((response) => response.json())
-        .then((data) => setCategories(data));
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+
+  const [errMsg, setErrMsg] = useState("");
+
+  //** FetchApi **//
+
+  // useEffect(() => {
+  //   try {
+  //     fetch("http://127.0.0.1:8000/api/category/")
+  //       .then((response) => response.json())
+  //       .then((data) => setCategories(data));
+  //   } catch (error) {
+  //     setErrMsg(error)
+  //     console.log(error);
+  //   }
+
+  // }, []);
   //   const categories = ["Accesories", "Smartphones", "Subscriptions"];
 
   return (
@@ -21,7 +28,7 @@ const CategoriesNavBar = ({ switchSideNav }) => {
           <li className=" bg-gray-50 text-left px-3 py-3">
             {categories.count}
           </li>
-
+          {errMsg}
           {/* {categories.results.map((result, index) => (
             <li key={index}>{JSON.stringify(result)}</li>
           ))} */}

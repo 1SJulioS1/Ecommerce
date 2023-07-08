@@ -1,45 +1,10 @@
 import "./BottomNavBarStyles.css";
-// import React from 'react'
 import { NavLink } from "react-router-dom";
 import { BiCategoryAlt } from "react-icons/bi";
-
-// const BottomNavBar = () => {
-//   return (
-//     <div>
-//       <nav className='bottom-nav-bar'>
-//         <ul>
-//           <li>
-//         <NavLink to='/'>
-//           <span className="material-symbols-rounded">home</span>
-//           Home
-//         </NavLink>
-//         </li>
-//         <li>
-//         <NavLink to='user'><span className="material-symbols-rounded">person</span>
-//           User
-//         </NavLink>
-//         </li>
-//         <li>
-//         <NavLink to='cart'><span className="material-symbols-rounded">shopping_cart</span>
-//           Cart
-//         </NavLink>
-//         </li>
-//         <li>
-//         <NavLink to='orders'><span className="material-symbols-rounded">fact_check</span>
-//           Orders
-//         </NavLink>
-//         </li>
-// </ul>
-//       </nav>
-//     </div>
-//   )
-// }
-
-// export default BottomNavBar
-
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import SearchBar from "./SearchBar";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -53,12 +18,12 @@ const navigation = [
 
 export default function BottomNavBar({ switchSideNav }) {
   return (
-    <Disclosure as="nav" className="bg-red-800 shadow-xl">
+    <Disclosure as="nav" className="bg-red-900 shadow-xl ">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
-              <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+              <div className="absolute inset-y-0 left-0 space-x-6 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open main menu</span>
@@ -76,6 +41,7 @@ export default function BottomNavBar({ switchSideNav }) {
                   <BiCategoryAlt className=" self-center" />
                   <h2>Categories</h2>
                 </button>
+                <SearchBar className=" self-center"></SearchBar>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
@@ -94,18 +60,18 @@ export default function BottomNavBar({ switchSideNav }) {
                   <div className="flex justify-center content-center space-x-4 ">
                     <button
                       className="text-gray-300 flex gap-2 content-end hover:bg-gray-700 hover:text-white
-                          rounded-md px-3 py-2 text-sm font-medium transition-all bg-red-950  p-3 "
+                          rounded-md px-3 py-2 text-sm font-medium transition-all bg-red-1000"
                       onClick={switchSideNav}
                     >
                       <BiCategoryAlt className=" self-center" />
-                      <h2>Categories</h2>
+                      <h2 className="self-center">Categories</h2>
                     </button>
                     {navigation.map((item) => (
                       <NavLink
                         to={item.href}
                         key={item.name}
                         className={classNames(
-                          "text-gray-300 hover:bg-gray-700 hover:text-white",
+                          "text-gray-300 self-center hover:bg-gray-700 hover:text-white",
                           "rounded-md px-3 py-2 text-sm font-medium transition-all"
                         )}
                         aria-current={item.current ? "page" : undefined}
@@ -113,6 +79,7 @@ export default function BottomNavBar({ switchSideNav }) {
                         {item.name}
                       </NavLink>
                     ))}
+                    <SearchBar className="self-center"></SearchBar>
                   </div>
                 </div>
               </div>
