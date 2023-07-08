@@ -863,3 +863,23 @@ class OrderView(APIView):
             order__status='processing', order__user=request.user)
         serializer = OrderItemSerializer(order_items, many=True)
         return Response(serializer.data)
+
+
+class OrderUpdateView(generics.UpdateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsBuyer]
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Order",
+        responses={
+            200: OrderSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)

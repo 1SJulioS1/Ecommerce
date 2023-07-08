@@ -56,5 +56,6 @@ urlpatterns = [
          name="courier_list_create"),
 
     # Order view
-    path("order/", OrderView.as_view(), name="order-view")
+    path("order/", OrderView.as_view(), name="order_view"),
+    path("order/<int:pk>", OrderUpdateView.as_view(), name="order_update")
 ]
