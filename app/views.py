@@ -773,6 +773,42 @@ class OrderView(APIView):
     """
     permission_classes = [IsBuyer]
 
+    @swagger_auto_schema(
+        operation_summary="Create an order",
+        operation_description="Create an order with cart items and address",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'cart_items': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'product': openapi.Schema(type=openapi.TYPE_STRING),
+                            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        }
+                    )
+                ),
+                'address': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'number': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'street': openapi.Schema(type=openapi.TYPE_STRING),
+                        'city': openapi.Schema(type=openapi.TYPE_STRING),
+                        'state': openapi.Schema(type=openapi.TYPE_STRING),
+                        'extra_info': openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
+                    }
+                ),
+            },
+            required=['cart_items', 'address'],
+        ),
+        responses={
+            201: "Order created",
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+    )
     def post(self, request):
 
         cart_itemms_data = request.data.get('cart_items')
@@ -814,3 +850,16 @@ class OrderView(APIView):
             return Response({'message': "Order created"}, status=status.HTTP_201_CREATED)
         except Cart.DoesNotExist:
             return Response({'error': "user doesn't have associated cart "}, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_description="Retrieve cart items for logged user",
+        responses={
+            200: OrderItemSerializer(many=True),
+            401: "Unauthorized",
+        }
+    )
+    def get(self, request):
+        order_items = OrderItem.objects.filter(
+            order__status='processing', order__user=request.user)
+        serializer = OrderItemSerializer(order_items, many=True)
+        return Response(serializer.data)

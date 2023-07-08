@@ -76,3 +76,10 @@ class CourierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Courier
         fields = '__all__'
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = "__all__"
+        depth = 2
