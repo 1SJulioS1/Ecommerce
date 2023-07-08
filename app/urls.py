@@ -47,6 +47,11 @@ urlpatterns = [
     path("product/detail/<slug:slug>",
          ProductDetailView.as_view(), name="product_detail"),
 
+    # Cart CRUD
+    path("cart/", CartView.as_view(), name="cart-view"),
 
-
+    # Courier CRUD
+    path("courier/", CourierListCreateView.as_view(), name="courier_list_create"),
+    path("courier/<int:pk>", CourierDetailUpdateDeleteView.as_view(),
+         name="courier_list_create"),
 ]

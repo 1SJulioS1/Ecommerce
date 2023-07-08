@@ -314,7 +314,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     )
     def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
+        return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(
         operation_description="Update a single instance of Category",
@@ -331,7 +331,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         return super().put(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Delete a single instance of MyModel",
+        operation_description="Delete a single instance of Category",
         responses={
             204: "Remove success",
             401: "Unauthorized",
@@ -471,34 +471,297 @@ class ProductListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_to_cart(request):
-    product_id = request.data.get('product_id')
-    quantity = request.data.get('quantity')
+class CartView(APIView):
+    """
+        Cart related view
+    """
+    permission_classes = [IsBuyer]
 
-    try:
-        product = Product.objects.get(pk=product_id)
+    @swagger_auto_schema(
+        operation_description="Add items to cart",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'cart_items': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'product': openapi.Schema(type=openapi.TYPE_STRING),
+                            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        },
+                        required=['product', 'quantity']
+                    )
+                ),
+            },
+            required=['cart_items']
+        ),
+        responses={
+            201: "Cart created successfully",
+            400: "Bad request: Insufficient product quantity",
+            401: "Unauthorized",
+            404: "Not found: Product not found or no cart_items provided"
+        },
+        manual_parameters=token_as_parameters
+    )
+    def post(self, request):
+        user = request.user
 
-        # Verificar si el usuario tiene un carrito asociado
+        # Crear un nuevo carrito para el usuario si no existe
+        cart, created = Cart.objects.get_or_create(user=user)
+
+        # Obtener los datos de los cart_items del request
+        cart_items_data = request.data.get('cart_items')
+
+        # Verificar si se enviaron datos de cart_items
+        if not cart_items_data:
+            return Response({'error': 'No cart_items provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Añadir o actualizar cada cart_item en el carrito
+        for cart_item_data in cart_items_data:
+            product_id = cart_item_data.get('product')
+            quantity = cart_item_data.get('quantity')
+
+            # Verificar si se enviaron los datos necesarios
+            if not product_id or not quantity:
+                return Response({'error': 'Invalid cart_item data'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                product = Product.objects.get(name=product_id)
+            except Product.DoesNotExist:
+                return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            if quantity > product.quantity:
+                return Response({'error': 'Insufficient product quantity'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Verificar si el producto ya existe en el carrito
+            cart_item = cart.cartitem_set.filter(product=product).first()
+
+            if cart_item:
+                # Si el producto ya existe, actualizar la cantidad en el cart_item y disminuir la existencia del producto
+                cart_item.quantity += quantity
+                cart_item.save()
+            else:
+                # Si el producto no existe, crear un nuevo cart_item y añadirlo al carrito
+                CartItem.objects.create(
+                    cart=cart, product=product, quantity=quantity)
+
+            # Disminuir la existencia del producto
+            product.quantity -= quantity
+            product.save()
+
+        return Response({'message': 'Cart updated successfully'}, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_description="Retrieve cart items for logged user",
+        responses={
+            200: CartItemSerializer(many=True),
+            401: "Unauthorized",
+        }
+    )
+    def get(self, request):
+        user = request.user
+        cart_items = CartItem.objects.filter(cart__user_id=user)
+        serializer = CartItemSerializer(cart_items, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_description="Delete all cart items for a user",
+        responses={
+            200: openapi.Response(
+                description="Successful response",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Success message"
+                        )
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    }
+                )
+            ),
+            401: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'detail': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    }
+                )
+            )
+        }
+    )
+    def delete(self, request):
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
+            cart_items.delete()
+            return Response({'message': "success"}, status=status.HTTP_200_OK)
+        except Cart.DoesNotExist:
+            return Response({'error': "user doesn't have associated cart "}, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_description='Update quantity of cart item',
+        responses={
+            200: openapi.Response(description='Cart item updated successfully'),
+            400: openapi.Response(description="Bad Request", examples={
+                "application/json": {
+                    "error": "Error message"
+                }
+            }),
+            404: openapi.Response(description="Not Found", examples={
+                "application/json": {
+                    "error": "Error message"
+                }
+            }),
+            401: openapi.Response(description="Unauthorized", examples={
+                "application/json": {
+                    "error": "Unauthorized"
+                }
+            })
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'cart_items': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'product': openapi.Schema(type=openapi.TYPE_STRING),
+                            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER)
+                        }
+                    )
+                )
+            },
+            required=['cart_items']
+        )
+    )
+    def patch(self, request):
+        """
+            Update quantity of cart item
+        """
         try:
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
-            # Si el usuario no tiene un carrito, crear uno nuevo y asociarlo al usuario
-            cart = Cart.objects.create(user=request.user)
+            return Response({'error': "user doesn't have associated cart "}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verificar si el producto ya existe en el carrito
-        cart_item = CartItem.objects.filter(cart=cart, product=product).first()
+        try:
+            cart_item = CartItem.objects.get(cart=cart)
+        except CartItem.DoesNotExist:
+            return Response({'error': 'Cart item not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        if cart_item:
-            # El producto ya existe en el carrito, actualizar la cantidad
-            cart_item.quantity += quantity
-            cart_item.save()
-        else:
-            # El producto no existe en el carrito, crear un nuevo elemento del carrito
-            cart_item = CartItem.objects.create(
-                cart=cart, product=product, quantity=quantity)
+        cart_items_data = request.data.get('cart_items')
+        if not cart_items_data:
+            return Response({'error': 'No cart_items provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': 'Producto agregado al carrito exitosamente'})
-    except Product.DoesNotExist:
-        return Response({'message': 'El producto no existe'}, status=400)
+        for cart_item_data in cart_items_data:
+            product_name = cart_item_data.get('product')
+            quantity = cart_item_data.get('quantity')
+
+            if not product_name or not quantity:
+                return Response({'error': 'Invalid cart_item data'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if cart_item.product.name == product_name:
+                # if quantity is added
+                product = Product.objects.get(name=product_name)
+                if quantity > cart_item.quantity:
+                    if quantity > product.quantity:
+                        return Response({'error': 'Insufficient product quantity'}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        product.quantity -= quantity - cart_item.quantity
+                        product.save()
+                else:
+                    product.quantity += cart_item.quantity - quantity
+                    product.save()
+                cart_item.quantity = quantity
+                cart_item.save()
+
+                return Response({'message': 'Cart item updated successfully'})
+
+        return Response({'error': 'Cart item not found in the request'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CourierListCreateView(generics.ListCreateAPIView):
+    queryset = Courier.objects.all()
+    serializer_class = CourierSerializer
+    permission_classes = [IsAdmin]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name', 'availability']
+    ordering_fields = ['name', 'availability', 'phone']
+    lookup_field = 'name'
+
+
+class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Courier.objects.all()
+    serializer_class = CourierSerializer
+    permission_classes = [IsAdmin]
+
+    @swagger_auto_schema(
+        operation_description="Retrieve a single instance of Courier",
+        responses={
+            200: CourierSerializer(),
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Courier",
+        responses={
+            200: CourierSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a single instance of Courier",
+        responses={
+            200: CourierSerializer(),
+            400: "Bad request",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Delete a single instance of Courier",
+        responses={
+            204: "Remove success",
+            401: "Unauthorized",
+            404: "Not found"
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)

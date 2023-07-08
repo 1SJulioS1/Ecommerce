@@ -7,7 +7,7 @@ import requests
 from datetime import timedelta
 from django.core.files.temp import NamedTemporaryFile
 
-from app.models import CustomUser, Address, Category, Product
+from app.models import *
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -63,3 +63,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_image_display(self, obj):
         return obj.image.url if obj.image else None
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity']
+        depth = 1
+
+
+class CourierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Courier
+        fields = '__all__'
