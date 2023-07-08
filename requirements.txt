@@ -5,6 +5,7 @@ charset-normalizer==3.1.0
 coreapi==2.3.3
 coreschema==0.0.4
 Django==4.2.2
+django-cors-headers==4.1.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.6
@@ -19,11 +20,15 @@ Pillow==9.5.0
 PyJWT==2.7.0
 pyrsistent==0.19.3
 pytz==2023.3
+pywin32==306
 PyYAML==6.0
 requests==2.31.0
+six==1.16.0
 sqlparse==0.4.4
 swagger-spec-validator==3.0.3
+traitlets==5.9.0
 typing_extensions==4.6.3
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==2.0.3
+wcwidth==0.2.6
