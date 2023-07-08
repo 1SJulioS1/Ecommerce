@@ -765,3 +765,52 @@ class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     )
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
+
+
+class OrderView(APIView):
+    """
+        Order related view
+    """
+    permission_classes = [IsBuyer]
+
+    def post(self, request):
+
+        cart_itemms_data = request.data.get('cart_items')
+        address_data = request.data.get('address')
+
+        if not cart_itemms_data:
+            return Response({'error': 'No cart_items provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not address_data:
+            return Response({'error': 'No address provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        address = Address.objects.create(number=address_data.get('number'), street=address_data.get('street'),
+                                         city=address_data.get('city'), state=address_data.get('state'), extra_info=address_data.get('extra_info'))
+        address.save()
+        courier = Courier.objects.filter(availability=True).first()
+
+        order = Order.objects.create(
+            user=request.user, address=address, courier=courier)
+
+        for cart_item_data in cart_itemms_data:
+            product = cart_item_data.get('product')
+            quantity = cart_item_data.get('quantity')
+
+            if not product or not quantity:
+                return Response({'error': 'Invalid cart_item data'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                product = Product.objects.get(name=product)
+            except Product.DoesNotExist:
+                return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            OrderItem.objects.create(
+                order=order, product=product, quantity=quantity
+            )
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
+            cart_items.delete()
+            return Response({'message': "Order created"}, status=status.HTTP_201_CREATED)
+        except Cart.DoesNotExist:
+            return Response({'error': "user doesn't have associated cart "}, status=status.HTTP_400_BAD_REQUEST)
