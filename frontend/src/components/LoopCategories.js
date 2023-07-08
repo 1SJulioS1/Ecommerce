@@ -25,7 +25,7 @@ const LoopCategories = () => {
   ];
 
   return (
-    <div className="bg-slate-800 text-white py-1 w-full overflow-hidden">
+    <div className=" bg-sky-900 text-white py-1 w-full overflow-hidden">
       <ul className="flex w-full justify-around scrollLetters flex-wrap">
         {categories.map((each, i) => (
           <li

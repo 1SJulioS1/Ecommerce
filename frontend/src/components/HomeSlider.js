@@ -59,7 +59,7 @@ const HomeSlider = () => {
   }, []);
 
   return (
-    <div className="max-w-[1400px] h-[780px] m-auto py-20 px-4 group">
+    <div className="max-w-[1400px] h-[500px] mx-auto p-2 sm:py-20 group">
       <div
         style={{ backgroundImage: `url(${slides[currentIndex].url})` }}
         className="w-full h-full rounded-2xl bg-center bg-cover duration-500"
@@ -83,14 +83,14 @@ const HomeSlider = () => {
         </div>
       </div>
 
-      <div className="flex top-4 justify-center py-2">
+      <div className="flex top-4 hover:bg-gray-300 rounded-md m-auto w-fit transition-all h-fit justify-center px-0 mt-2">
         {slides.map((slide, slideIndex) => (
           <div
             key={slideIndex}
             onClick={() => goToSlide(slideIndex)}
-            className="text-2xl cursor-pointer"
+            className="text-2xl   transition-all p-1 hover:rounded-full  cursor-pointer"
           >
-            <RxDotFilled />
+            <RxDotFilled className="text-red-800 hover:text-white transition-all " />
           </div>
         ))}
       </div>

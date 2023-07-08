@@ -10,10 +10,10 @@ import { GoGraph } from "react-icons/go";
 import { RiDashboard3Fill } from "react-icons/ri";
 
 const DashBoardSideNavBar = () => {
-  const navlinkStyles = "flex items-center gap-2 p-2 ";
+  const navlinkStyles = "flex items-center transition-all gap-2 p-2 ";
 
   return (
-    <div className="flex flex-col text-left bg-slate-300 h-screen w-2/12">
+    <div className="flex flex-col text-left bg-gray-200 h-screen w-2/12">
       <NavLink className={navlinkStyles} to="/admin">
         <RiDashboard3Fill />
         Dashboard

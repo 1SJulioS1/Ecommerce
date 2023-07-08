@@ -28,11 +28,11 @@ function App() {
           <Route path="register" element={<Register />}></Route>
           <Route path="login" element={<Login />}></Route>
           <Route path="unauthorized" element={<Unauthorized />} />
-          <Route path="users" element={<Users />}></Route>
         </Route>
         <Route element={<RequiredAuth />}>
           <Route path="admin" element={<DashboardSharedLayout />}>
             <Route path="orders"></Route>
+            <Route path="users" element={<Users />}></Route>
             <Route path="products"></Route>
             <Route path="graphs"></Route>
             <Route path="inventory"></Route>

@@ -20,10 +20,14 @@ ul li a {
   margin: 1%;
 } */
 .active {
-  background-color: black;
+  transition: all;
   color: white !important;
-  transition: 0.5s all ease;
+  background-color: black;
+  transition: all;
+  text-shadow: 0 0 10px white;
+  font-size: 1.02rem;
 }
+
 /* a {
   color: black;
 } */
