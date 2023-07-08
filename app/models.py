@@ -22,7 +22,7 @@ class Address(models.Model):
         max_length=300, blank=True, null=True, default=None)
 
     def __str__(self):
-        return f'{self.number}, {self.street}, {self.city}, {self.state}, {self.country}'
+        return f'{self.number}, {self.street}, {self.city}, {self.state}'
 
 
 class CustomUser(AbstractUser):
@@ -102,6 +102,9 @@ class Courier(models.Model):
         validators=[phone_validator]
     )
     availability = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.name} ({self.phone})'
 
 
 class Order(models.Model):
