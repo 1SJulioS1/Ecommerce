@@ -6,9 +6,7 @@ from drf_yasg import openapi
 api_info = openapi.Info(
     title='My API',
     default_version='v1',
-    description='Descripción de mi API',
-    contact=openapi.Contact(email='contact@example.com'),
-    license=openapi.License(name='MIT License'),
+    contact=openapi.Contact(email='sjsiless@gmail.com'),
 )
 schema_view = get_schema_view(
     api_info,

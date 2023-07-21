@@ -43,9 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'corsheaders',
-
-
-
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -220,6 +218,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
     'DEFAULT_CACHE_BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 SWAGGER_SETTINGS = {

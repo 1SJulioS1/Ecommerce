@@ -18,6 +18,7 @@ from app.serializers import *
 from app.permissions import *
 from app.models import *
 from .custom_strings import *
+from .filters import *
 
 
 class UserRegistrationView(APIView):
@@ -240,7 +241,6 @@ class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
-    filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name']
     ordering_fields = ['name']
 
@@ -457,7 +457,7 @@ class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
-    filter_backends = [SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
@@ -701,7 +701,6 @@ class CourierListCreateView(generics.ListCreateAPIView):
     queryset = Courier.objects.all()
     serializer_class = CourierSerializer
     permission_classes = [IsAdmin]
-    filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'availability']
     ordering_fields = ['name', 'availability', 'phone']
     lookup_field = 'name'
@@ -883,3 +882,42 @@ class OrderUpdateView(generics.UpdateAPIView):
     )
     def patch(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
+
+
+class OrderListView(generics.ListAPIView):
+    """
+    View all order data
+    """
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAdmin]
+    filterset_class = OrderFilter
+    search_fields = ['user', 'address', 'created_at',
+                     'updated_at', 'status', 'courier']
+    ordering_fields = ['user', 'address', 'created_at',
+                       'updated_at', 'status', 'courier']
+
+    @swagger_auto_schema(
+        responses={
+            200: OrderSerializer(many=True),
+            400: openapi.Response(
+                description="Unauthorized",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message"
+                        )
+                    },
+                    required=['error']
+                ),
+                operation_description='Not allowed to enter this view'
+
+            ),
+        },
+        manual_parameters=token_as_parameters
+
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
