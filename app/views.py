@@ -6,12 +6,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics, status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.decorators import api_view, permission_classes
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
-from django.shortcuts import get_object_or_404
 
 
 from app.serializers import *
@@ -207,7 +204,7 @@ class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdmin]
-    filter_backends = [SearchFilter, OrderingFilter]
+    filterset_class = CustomUserFilter
     search_fields = ['username', 'email']
     ordering_fields = ['usernname']
 

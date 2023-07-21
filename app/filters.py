@@ -1,4 +1,6 @@
 import django_filters
+from django.contrib.auth import get_user_model
+
 from .models import *
 
 
@@ -37,4 +39,17 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
+        fields = []
+
+
+class CustomUserFilter(django_filters.FilterSet):
+    last_login = django_filters.DateTimeFilter(field_name='last_login')
+    username = django_filters.CharFilter(lookup_expr='icontains')
+    active = django_filters.BooleanFilter(field_name='is_active')
+    date_joined = django_filters.DateTimeFilter(field_name='date_joined')
+    user_type = django_filters.ChoiceFilter(
+        choices=get_user_model().USER_TYPE_CHOICES)
+
+    class Meta:
+        model = get_user_model()
         fields = []
