@@ -48,3 +48,8 @@ swagger.json
 
 media/*
 Launch server.bat
+
+export_swagger.py
+swagger.json
+swagger_spec.json
+README.md
