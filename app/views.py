@@ -222,11 +222,9 @@ class UserListView(generics.ListAPIView):
                     required=['error']
                 ),
                 operation_description='Not allowed to enter this view'
-
             ),
         },
-        manual_parameters=token_as_parameters
-
+        manual_parameters=token_as_parameters,
     )
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
