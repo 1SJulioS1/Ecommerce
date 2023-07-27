@@ -34,7 +34,7 @@ urlpatterns = [
 
 
     # category management
-    path("category/", CategoryListView.as_view(), name="category_list_create"),
+    path("category/", CategoryListView.as_view(), name="category_list"),
     path("category/create/", CategoryCreateView.as_view(), name="category_create"),
     path("category/<slug:slug>",
          CategoryDetailUpdateDeleteView.as_view(), name="category_detail_update_remove"),

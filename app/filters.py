@@ -53,3 +53,23 @@ class CustomUserFilter(django_filters.FilterSet):
     class Meta:
         model = get_user_model()
         fields = []
+
+
+class CategoryFilter(django_filters.FilterSet):
+    class Meta:
+        model = Category
+        fields = {
+            'name': ['exact', 'icontains'],
+            'parent_category': ['exact'],
+
+        }
+
+
+class CourierFilter(django_filters.FilterSet):
+    class Meta:
+        model = Courier
+        fields = {
+            'name': ['exact', 'icontains'],
+            'phone': ['exact', 'icontains'],
+            'availability': ['exact'],
+        }

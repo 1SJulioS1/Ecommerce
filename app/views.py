@@ -5,7 +5,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics, status
-from rest_framework.filters import SearchFilter, OrderingFilter
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -205,7 +204,6 @@ class UserListView(generics.ListAPIView):
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdmin]
     filterset_class = CustomUserFilter
-    search_fields = ['username', 'email']
     ordering_fields = ['usernname']
 
     @swagger_auto_schema(
@@ -238,7 +236,7 @@ class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
-    search_fields = ['name']
+    filterset_class = CategoryFilter
     ordering_fields = ['name']
 
     @swagger_auto_schema(
@@ -698,7 +696,7 @@ class CourierListCreateView(generics.ListCreateAPIView):
     queryset = Courier.objects.all()
     serializer_class = CourierSerializer
     permission_classes = [IsAdmin]
-    search_fields = ['name', 'availability']
+    filterset_class = CourierFilter
     ordering_fields = ['name', 'availability', 'phone']
     lookup_field = 'name'
 
