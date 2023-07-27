@@ -21,6 +21,7 @@ Pillow==9.5.0
 PyJWT==2.7.0
 pyrsistent==0.19.3
 pytz==2023.3
+pywin32==306
 PyYAML==6.0
 requests==2.31.0
 six==1.16.0

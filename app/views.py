@@ -70,7 +70,7 @@ class AdminRegistrationView(APIView):
                 )
             },
         ),
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def post(self, request):
         data = request.data.copy()
@@ -112,7 +112,7 @@ class UserDetailView(APIView):
                 operation_description='Retrieve user profile data'
             ),
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def get(self, request):
         serializer = CustomUserSerializer(request.user)
@@ -147,7 +147,7 @@ class UserDetailView(APIView):
                 )
             ),
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def patch(self, request):
         user = CustomUser.objects.get(username=request.user.username)
@@ -184,7 +184,7 @@ class UserLogoutView(APIView):
                 operation_description='Retrieve user profile data'
             ),
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def post(self, request):
         try:
@@ -224,7 +224,25 @@ class UserListView(generics.ListAPIView):
                 operation_description='Not allowed to enter this view'
             ),
         },
-        manual_parameters=token_as_parameters,
+        manual_parameters=[token_as_parameters,
+                           openapi.Parameter('last_login', openapi.IN_QUERY,
+                                             type=openapi.TYPE_STRING,
+                                             format=openapi.FORMAT_DATE,
+                                             description='Filter by last login date'),
+                           openapi.Parameter('username', openapi.IN_QUERY,
+                                             type=openapi.TYPE_STRING,
+                                             description='Filter by username (contains)'),
+                           openapi.Parameter('active', openapi.IN_QUERY,
+                                             type=openapi.TYPE_BOOLEAN,
+                                             description='Filter by active status (True or False)'),
+                           openapi.Parameter('date_joined', openapi.IN_QUERY,
+                                             type=openapi.TYPE_STRING,
+                                             format=openapi.FORMAT_DATE,
+                                             description='Filter by date joined'),
+                           openapi.Parameter('user_type', openapi.IN_QUERY,
+                                             type=openapi.TYPE_STRING,
+                                             description='Filter by user type (choices: choice1, choice2, ...)'),
+                           ],
     )
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -241,6 +259,14 @@ class CategoryListView(generics.ListAPIView):
         responses={
             200: CategorySerializer(many=True),
         },
+        manual_parameters=[
+            openapi.Parameter('name', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by name (exact or contains)'),
+            openapi.Parameter('parent_category', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by parent category (exact)'),
+        ],
     )
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -270,7 +296,7 @@ class CategoryCreateView(generics.CreateAPIView):
 
             ),
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -289,7 +315,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def get(self, request, *args, **kwargs):
@@ -303,7 +329,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def put(self, request, *args, **kwargs):
@@ -317,7 +343,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def patch(self, request, *args, **kwargs):
@@ -330,7 +356,7 @@ class CategoryDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def delete(self, request, *args, **kwargs):
@@ -362,7 +388,7 @@ class ProductCreateView(generics.CreateAPIView):
             ),
             400: "Bad request",
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -398,7 +424,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def get(self, request, *args, **kwargs):
@@ -412,7 +438,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def put(self, request, *args, **kwargs):
@@ -426,7 +452,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def patch(self, request, *args, **kwargs):
@@ -439,7 +465,7 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def delete(self, request, *args, **kwargs):
@@ -459,6 +485,38 @@ class ProductListView(generics.ListAPIView):
         responses={
             200: ProductSerializer(many=True),
         },
+        manual_parameters=[
+            openapi.Parameter('name', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by name (exact or contains)'),
+            openapi.Parameter('category', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by category (exact)'),
+            openapi.Parameter('min_price', openapi.IN_QUERY,
+                              type=openapi.TYPE_NUMBER,
+                              description='Filter by minimum price'),
+            openapi.Parameter('max_price', openapi.IN_QUERY,
+                              type=openapi.TYPE_NUMBER,
+                              description='Filter by maximum price'),
+            openapi.Parameter('min_quantity', openapi.IN_QUERY,
+                              type=openapi.TYPE_NUMBER,
+                              description='Filter by minimum quantity'),
+            openapi.Parameter('max_quantity', openapi.IN_QUERY,
+                              type=openapi.TYPE_NUMBER,
+                              description='Filter by maximum quantity'),
+            openapi.Parameter('start_date', openapi.IN_QUERY,
+                              type=openapi.FORMAT_DATE,
+                              description='Filter by start date (created_at)'),
+            openapi.Parameter('end_date', openapi.IN_QUERY,
+                              type=openapi.FORMAT_DATE,
+                              description='Filter by end date (created_at)'),
+            openapi.Parameter('start_updated', openapi.IN_QUERY,
+                              type=openapi.FORMAT_DATE,
+                              description='Filter by start date (updated_at)'),
+            openapi.Parameter('end_updated', openapi.IN_QUERY,
+                              type=openapi.FORMAT_DATE,
+                              description='Filter by end date (updated_at)'),
+        ]
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -495,7 +553,7 @@ class CartView(APIView):
             401: "Unauthorized",
             404: "Not found: Product not found or no cart_items provided"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
     )
     def post(self, request):
         user = request.user
@@ -698,6 +756,25 @@ class CourierListCreateView(generics.ListCreateAPIView):
     ordering_fields = ['name', 'availability', 'phone']
     lookup_field = 'name'
 
+    @swagger_auto_schema(
+        responses={
+            200: CourierSerializer(many=True),
+        },
+        manual_parameters=[
+            openapi.Parameter('name', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by name (exact or contains)'),
+            openapi.Parameter('phone', openapi.IN_QUERY,
+                              type=openapi.TYPE_STRING,
+                              description='Filter by phone (exact or contains)'),
+            openapi.Parameter('availability', openapi.IN_QUERY,
+                              type=openapi.TYPE_BOOLEAN,
+                              description='Filter by availability (True or False)'),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Courier.objects.all()
@@ -711,7 +788,7 @@ class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def get(self, request, *args, **kwargs):
@@ -725,7 +802,7 @@ class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def put(self, request, *args, **kwargs):
@@ -739,7 +816,7 @@ class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def patch(self, request, *args, **kwargs):
@@ -752,7 +829,7 @@ class CourierDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def delete(self, request, *args, **kwargs):
@@ -870,7 +947,7 @@ class OrderUpdateView(generics.UpdateAPIView):
             401: "Unauthorized",
             404: "Not found"
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters]
 
     )
     def patch(self, request, *args, **kwargs):
@@ -909,7 +986,20 @@ class OrderListView(generics.ListAPIView):
 
             ),
         },
-        manual_parameters=token_as_parameters
+        manual_parameters=[token_as_parameters,
+                           openapi.Parameter('start_created_at', openapi.IN_QUERY,
+                                             type=openapi.FORMAT_DATE,
+                                             description='Filter by start created date (greater than or equal to)'),
+                           openapi.Parameter('end_created_at', openapi.IN_QUERY,
+                                             type=openapi.FORMAT_DATE,
+                                             description='Filter by end created date (less than or equal to)'),
+                           openapi.Parameter('start_updated_at', openapi.IN_QUERY,
+                                             type=openapi.FORMAT_DATE,
+                                             description='Filter by start updated date (greater than or equal to)'),
+                           openapi.Parameter('end_updated_at', openapi.IN_QUERY,
+                                             type=openapi.FORMAT_DATE,
+                                             description='Filter by end updated date (less than or equal to)'),
+                           ]
 
     )
     def get(self, request, *args, **kwargs):
