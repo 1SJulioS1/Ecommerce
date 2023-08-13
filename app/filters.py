@@ -21,6 +21,8 @@ class ProductFilter(django_filters.FilterSet):
         field_name='updated_at', lookup_expr='gte')
     end_updated = django_filters.DateFilter(
         field_name='updated_at', lookup_expr='lte')
+    name = django_filters.CharFilter(lookup_expr='icontains')
+    category = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Product

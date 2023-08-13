@@ -473,13 +473,15 @@ class ProductView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ProductListView(generics.ListAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     filterset_class = ProductFilter
     search_fields = ['name', 'category', 'price']
     ordering_fields = ['name', 'category', 'price']
     lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Product.objects.all().order_by('name')
 
     @swagger_auto_schema(
         responses={
@@ -493,16 +495,16 @@ class ProductListView(generics.ListAPIView):
                               type=openapi.TYPE_STRING,
                               description='Filter by category (exact)'),
             openapi.Parameter('min_price', openapi.IN_QUERY,
-                              type=openapi.TYPE_NUMBER,
+                              type=openapi.TYPE_INTEGER,
                               description='Filter by minimum price'),
             openapi.Parameter('max_price', openapi.IN_QUERY,
-                              type=openapi.TYPE_NUMBER,
+                              type=openapi.TYPE_INTEGER,
                               description='Filter by maximum price'),
             openapi.Parameter('min_quantity', openapi.IN_QUERY,
-                              type=openapi.TYPE_NUMBER,
+                              type=openapi.TYPE_INTEGER,
                               description='Filter by minimum quantity'),
             openapi.Parameter('max_quantity', openapi.IN_QUERY,
-                              type=openapi.TYPE_NUMBER,
+                              type=openapi.TYPE_INTEGER,
                               description='Filter by maximum quantity'),
             openapi.Parameter('start_date', openapi.IN_QUERY,
                               type=openapi.FORMAT_DATE,
@@ -519,7 +521,14 @@ class ProductListView(generics.ListAPIView):
         ]
     )
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CartView(APIView):
